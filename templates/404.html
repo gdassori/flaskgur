@@ -3,6 +3,12 @@
 404
 {% endblock %}
 {% block content %}
-	<h1>You're not supposed to be here</h1>
-    <div id="image"><img class="new" src="{{ url_for('static', filename='404.jpg') }}"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+	        <center><h1>404, You're not supposed to be here</h1></center>
+            <img class="center-block" src="{{ url_for('static', filename='404.jpg') }}">
+        </div>
+    </div>
+
 {% endblock %}

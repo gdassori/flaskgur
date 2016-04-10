@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap-3.3.6-dist/css/bootstrap.min.css') }}">
     <title>{% block title %} {% endblock %} - Flaskgur</title>
 	<body>
-		<div id="header">
-			<a class="nav" href="{{ basepath }}">Flaskgur</a>
-		</div>
-		
-		<div id="upload">
-			<h1>Upload Picture</h1>
-			<form action="{{ basepath }}upload" method=post enctype=multipart/form-data>
-			<p>
-				<input type=file name=file><br />
-				<input type=submit value=Upload>
-			</p>
-		</div>
-		
-		<div id="content">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+		  		<a class="navbar-brand" href="{{ basepath }}">Flaskgur</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<form class="navbar-form navbar-right" action="{{ basepath }}upload" method=post enctype=multipart/form-data>
+					<div class="form-group">
+				  		<input type="file" name="file" class="form-control">
+					</div>
+					<button type="submit" value=Upload class="btn btn-success">Upload</button>
+			  	</form>
+			</div><!--/.navbar-collapse -->
+	  	</div>
+	</nav>
+
+	<div class="container" style="margin-top:50px">
 			{% block content %}
 			{% endblock %}
-		</div>
+	</div>
 		
-		<div id="footer">Flaskgur &copy Copyright 2014 - <a href="http://www.chokepoint.net" target="_blank">Chokepoint</a>
+	<div class="footer" style="margin-top:150px">
+		<div class="container">
+			Flaskgur &copy Copyright 2014 - <a href="http://www.chokepoint.net" target="_blank">Chokepoint</a>
 		</div>
+	</div>
 	</body>
 </html>

@@ -7,13 +7,17 @@
 Open Source Image Sharer
 {% endblock %}
 {% block content %}
+	<div class="row" style="padding: 20px">
 	{% if filename is defined %}
-		<div id="image"><a href="{{ pic_path(filename) }}" target="_blank"><img class="new" src="{{ pic_path(filename) }}"></a></div>
-	{% else %}
-		<ul>
-		{% for pic in pics %}
-			<li class="thumb"><a href="{{ url_for('show_pic', filename=pic) }}"><img class="thumb" src="{{ pic_path('thumb_'+pic) }}"></a></li>
-		{% endfor %}
-		</ul>
-	{% endif %}		    
+		<div class="col-md-12" style="margin:auto">
+			<a href="{{ pic_path(filename) }}" target="_blank"><img class="center-block" src="{{ pic_path(filename) }}"></a>
+		</div>
+		<br/>
+	{% endif %}
+	</div>
+	<div class="row">
+	{% for pic in pics %}
+		<div class="col-md-3" style="margin-top:20px"><a href="{{ url_for('show_pic', filename=pic) }}"><img class="thumb" src="{{ pic_path('thumb_'+pic) }}"></a></div>
+	{% endfor %}
+	</div>
 {% endblock %}
