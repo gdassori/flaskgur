@@ -7,19 +7,19 @@ import os
 import time
 
 DEBUG              = True
-BASE_DIR           = '/home/guido/Data/flaskgur/'
+BASE_DIR           = '/home/guido/dev/flaskgur/'
 UPLOAD_DIR         = BASE_DIR + 'pics'
 DATABASE           = BASE_DIR + 'flaskgur.db'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 BASE_PATH          = '/flaskgur/'
 
-app = Flask(__name__)
-app.config.from_object(__name__)
+application = Flask(__name__)
+application.config.from_object(__name__)
 
 def init_db():
-    with app.app_context():
+    with application.app_context():
         db = connect_db()
-        with app.open_resource(BASE_DIR+'schema.sql', mode='r') as f:
+        with application.open_resource(BASE_DIR+'schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
 
@@ -28,7 +28,7 @@ def check_extension(extension):
     return extension in ALLOWED_EXTENSIONS
 
 def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
+    return sqlite3.connect(application.config['DATABASE'])
 
 # Return a list of the last 25 uploaded images	
 def get_last_pics():
@@ -49,12 +49,12 @@ def add_pic(filename):
 # Generate thumbnail image
 def gen_thumbnail(filename):
     height = width = 200
-    original = Image.open(os.path.join(app.config['UPLOAD_DIR'], filename))
+    original = Image.open(os.path.join(application.config['UPLOAD_DIR'], filename))
     thumbnail = original.resize((width, height), Image.ANTIALIAS)
-    thumbnail.save(os.path.join(app.config['UPLOAD_DIR'], 'thumb_'+filename))
+    thumbnail.save(os.path.join(application.config['UPLOAD_DIR'], 'thumb_'+filename))
 	
 # Taken from flask example app
-@app.before_request
+@application.before_request
 def before_request():
     try:
        g.db = connect_db()
@@ -63,21 +63,21 @@ def before_request():
         g.db = connect_db()
 
 # Taken from flask example app
-@app.teardown_request
+@application.teardown_request
 def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
         
-@app.errorhandler(404)
+@application.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', basepath=BASE_PATH), 404
 
-@app.route(BASE_PATH)
+@application.route(BASE_PATH)
 def index():
     return render_template('index.html', pics=get_last_pics(), basepath=BASE_PATH)
 
-@app.route(BASE_PATH + 'upload', methods=['POST'])
+@application.route(BASE_PATH + 'upload', methods=['POST'])
 def upload_pic():
     file = request.files['file']
     try:
@@ -88,7 +88,7 @@ def upload_pic():
                                                                 str(int(time.time()))).encode()).hexdigest(),
                                       extension)
             file.seek(0) # Move cursor back to beginning so we can write to disk
-            file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
+            file.save(os.path.join(application.config['UPLOAD_DIR'], filename))
             add_pic(filename)
             gen_thumbnail(filename)
             return redirect(url_for('show_pic', filename=filename, basepath=BASE_PATH))
@@ -97,7 +97,7 @@ def upload_pic():
     except IndexError:
         abort(404)
 
-@app.route(BASE_PATH + 'show')
+@application.route(BASE_PATH + 'show')
 def show_pic():
     filename = request.args.get('filename', '')
     return render_template('index.html',
@@ -105,9 +105,9 @@ def show_pic():
                            basepath=BASE_PATH,
                            pics=get_related_pics(filename))
 
-@app.route(BASE_PATH + 'pics/<filename>')
+@application.route(BASE_PATH + 'pics/<filename>')
 def return_pic(filename):
-    return send_from_directory(app.config['UPLOAD_DIR'], filename)
+    return send_from_directory(application.config['UPLOAD_DIR'], filename)
 	
 if __name__ == '__main__':
     try:
@@ -115,4 +115,4 @@ if __name__ == '__main__':
             f.readline()
     except:
         init_db()
-    app.run(debug=DEBUG, host='0.0.0.0')
+    application.run(debug=DEBUG, host='0.0.0.0')
