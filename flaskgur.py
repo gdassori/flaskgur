@@ -16,7 +16,6 @@ BASE_PATH          = '/flaskgur/'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-
 def init_db():
     with app.app_context():
         db = connect_db()
@@ -36,6 +35,11 @@ def get_last_pics():
     cur = g.db.execute('select filename from pics order by id desc limit 25')
     filenames = [row[0] for row in cur.fetchall()]
     return filenames
+
+def get_related_pics(filename):
+    pics = get_last_pics()
+    pics.pop(pics.index(filename))
+    return pics
 
 # Insert filename into database	
 def add_pic(filename):
@@ -69,7 +73,7 @@ def teardown_request(exception):
 def page_not_found(e):
     return render_template('404.html', basepath=BASE_PATH), 404
 
-@app.route(BASE_PATH, )
+@app.route(BASE_PATH)
 def index():
     return render_template('index.html', pics=get_last_pics(), basepath=BASE_PATH)
 
@@ -96,7 +100,10 @@ def upload_pic():
 @app.route(BASE_PATH + 'show')
 def show_pic():
     filename = request.args.get('filename', '')
-    return render_template('index.html', filename=filename, basepath=BASE_PATH)
+    return render_template('index.html',
+                           filename=filename,
+                           basepath=BASE_PATH,
+                           pics=get_related_pics(filename))
 
 @app.route(BASE_PATH + 'pics/<filename>')
 def return_pic(filename):

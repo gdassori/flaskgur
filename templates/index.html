@@ -10,7 +10,11 @@ Open Source Image Sharer
 	<div class="row" style="padding: 20px">
 	{% if filename is defined %}
 		<div class="col-md-12" style="margin:auto">
-			<a href="{{ pic_path(filename) }}" target="_blank"><img style="border: 1px solid grey; padding: 30px; border-radius:7px" class="center-block" src="{{ pic_path(filename) }}"></a>
+			<a href="{{ pic_path(filename) }}" target="_blank">
+				<img style="border: 1px solid grey; padding: 30px; border-radius:7px"
+					 class="center-block"
+					 src="{{ pic_path(filename) }}">
+			</a>
 		</div>
 		<br/>
 	{% endif %}
