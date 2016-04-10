@@ -1,13 +1,13 @@
 from flask import Flask, request, g, redirect, url_for, abort, render_template, send_from_directory
 from werkzeug import secure_filename
 from hashlib import md5
-import Image
+from PIL import Image
 import sqlite3
 import os
 import time
 
 DEBUG              = True
-BASE_DIR           = '/var/www/changeme/flaskgur'
+BASE_DIR           = '/home/guido/dev/flaskgur/'
 UPLOAD_DIR         = BASE_DIR + 'pics'
 DATABASE           = BASE_DIR + 'flaskgur.db'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -15,12 +15,30 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+#Init db
+def init_db():
+    try:
+        get_last_pics()
+        return 'already initialized'
+    except:
+        with app.app_context():
+            db = connect_db()
+            with app.open_resource('schema.sql', mode='r') as f:
+                db.cursor().executescript(f.read())
+            db.commit()
+        return 'done'
+
 # Make sure extension is in the ALLOWD_EXTENSIONS set
 def check_extension(extension):
 	return extension in ALLOWED_EXTENSIONS
 
 def connect_db():
-	return sqlite3.connect(app.config['DATABASE'])
+  try:
+    return sqlite3.connect(app.config['DATABASE'])
+  except:
+    with open(DATABASE, 'wb') as f:
+      f.write('')
+    return sqlite3.connect(app.config['DATABASE'])
 
 # Return a list of the last 25 uploaded images	
 def get_last_pics():
@@ -56,7 +74,7 @@ def teardown_request(exception):
 def page_not_found(e):
     return render_template('404.html'), 404
 
-@app.route('/', methods=['GET','POST'])
+@app.route('/flaskgur', methods=['GET','POST'])
 def upload_pic():
 	if request.method == 'POST':
 		file = request.files['file']
@@ -76,6 +94,10 @@ def upload_pic():
 			abort(404)
 	else:
 		return render_template('upload.html', pics=get_last_pics())
+
+@app.route('{}/init'.format(PREFIX))
+def init():
+    return init_db()
 
 @app.route('/show')
 def show_pic():

@@ -1,0 +1,5 @@
+pics/
+*.db
+*.pyc
+.idea/
+venv/
